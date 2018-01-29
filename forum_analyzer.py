@@ -1,6 +1,12 @@
+import re
+import logging
+logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
+
 import pandas as pd
+import numpy as np
 
 from tagging.tag import TagDatasetHelper
+from summarization.summary import SummarizeTextHelper
 
 
 def get_twitter_dataset():
@@ -8,16 +14,21 @@ def get_twitter_dataset():
     df = df.iloc[:, [3, 4]]
 
     df.columns = ['plain_text', 'sentiment']
-    return df
+    plain_publications = [text.strip().lower() for text in df['plain_text'].tolist()]
+
+    for i, publication in enumerate(plain_publications):
+        plain_publications[i] = ' '.join(list(filter(None, re.split('[^а-я]', publication))))
+
+    return np.asarray(plain_publications)
 
 
 if __name__ == '__main__':
-    df = get_twitter_dataset()
-    plain_publications = [text.strip().lower() for text in df['plain_text'].tolist()]
+    plain_publications = get_twitter_dataset()
 
-    tag_dataset_helper = TagDatasetHelper()
-    tags = tag_dataset_helper.count_words_occurrences(plain_publications)
-    sentences_for_tags = tag_dataset_helper.get_posts_for_tags(tags)
+    # extract tags from text
+    tags_with_posts = TagDatasetHelper().get_tags_with_posts(plain_publications)
+    print(list(tags_with_posts.items())[:10])
 
-    for sentence_index in sentences_for_tags['мама']:
-        print(plain_publications[sentence_index])
+    # summarize text per tag
+    tags_with_summarized_posts = SummarizeTextHelper().summarize_text_per_tag(tags_with_posts, plain_publications)
+    print(tags_with_summarized_posts)
