@@ -1,0 +1,9 @@
+{% extends 'index.html' %}
+{% block tags %}
+    <div class="tag_list" style="width: 600px; margin: 40px auto; text-align: center;">
+      {% for item in tag_list %}
+          <p><a href="/tags/{{ item.0 }}/">'{{ item.0 }}' - {{ item.1 }}</a></p>
+      {% endfor %}
+    </div>
+{% endblock %}
+

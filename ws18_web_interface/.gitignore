@@ -1,0 +1,15 @@
+;;extensions to ignore
+*.log
+*.pot
+*.pyc
+
+;;directories to ignore
+.idea/
+venv/
+*/__pycache__
+*/migrations
+
+.gitconfig
+git_stats/
+
+media/*

@@ -1,0 +1,12 @@
+{% extends 'index.html' %}
+{% block choice %}
+    <div class="d-flex justify-content-center align-items-center" style="height: 80%">
+      <div class="col-1 align-middle">
+          <a href={% url "tags" %}  class="btn btn-dark" role="button">Tags</a>
+      </div>
+      <div class="col-2 align-middle">
+          <a href={% url "clusters" %} class="btn btn-dark align-middle" role="button">Clusters</a>
+      </div>
+    </div>
+{% endblock %}
+

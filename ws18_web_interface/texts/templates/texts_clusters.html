@@ -1,0 +1,9 @@
+{% extends 'index.html' %}
+{% block texts_cluster %}
+    <div class="text_list" style="width: 600px; margin: 40px auto; text-align: center;">
+      {% for item in texts %}
+          <p style="border: 2px solid black">{{ item }}</p>
+      {% endfor %}
+    </div>
+{% endblock %}
+
