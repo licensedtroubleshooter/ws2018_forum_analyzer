@@ -6,8 +6,12 @@ def texts_of_tag(tag):
         Получаем список текстов, в которых встречался tag
 
     """
-    connect = psycopg2.connect(database='forum_answers', user='roman',
-                               host='localhost', password='admin')
+    connect = psycopg2.connect(
+        database='forum_answers',
+        user='roman',
+        host='localhost',
+        password='admin'
+    )
 
     cursor = connect.cursor()
     cursor.execute(
@@ -30,9 +34,12 @@ def texts_of_tag(tag):
 
 def texts_of_cluster(cluster_id):
 
-
-    connect = psycopg2.connect(database='forum_answers', user='roman',
-                               host='localhost', password='admin')
+    connect = psycopg2.connect(
+        database='forum_answers',
+        user='roman',
+        host='localhost',
+        password='admin'
+    )
 
     cursor = connect.cursor()
     cursor.execute(
@@ -51,13 +58,39 @@ def texts_of_cluster(cluster_id):
     return texts
 
 
+def get_text(text_id):
+
+    connect = psycopg2.connect(
+        database='forum_answers',
+        user='roman',
+        host='localhost',
+        password='admin'
+    )
+    cursor = connect.cursor()
+
+    cursor.execute(
+
+        "SELECT text.plain_text "
+        "FROM texts_text AS text "
+        "WHERE text.id = {}".format(text_id)
+
+    )
+    url = cursor.fetchall()
+
+    return url
+
+
 def get_texts(list_id):
     """
         Итератор текстов из поступающего на вход списка идетификаторов
 
     """
-    connect = psycopg2.connect(database='forum_answers', user='roman',
-                               host='localhost', password='admin')
+    connect = psycopg2.connect(
+        database='forum_answers',
+        user='roman',
+        host='localhost',
+        password='admin'
+    )
 
     cursor = connect.cursor()
     for item in list_id:
@@ -77,8 +110,12 @@ def spam_status_to_active(id_text):
         Пометка о том, что текст является спамом
 
     """
-    connect = psycopg2.connect(database='forum_answers', user='roman',
-                               host='localhost', password='admin')
+    connect = psycopg2.connect(
+        database='forum_answers',
+        user='roman',
+        host='localhost',
+        password='admin'
+    )
 
     cursor = connect.cursor()
     cursor.execute(
@@ -95,8 +132,12 @@ def spam_status_to_non_active(id_text):
             Убираем пометку о том, что текст является спамом
 
     """
-    connect = psycopg2.connect(database='forum_answers', user='roman',
-                               host='localhost', password='admin')
+    connect = psycopg2.connect(
+        database='forum_answers',
+        user='roman',
+        host='localhost',
+        password='admin'
+    )
 
     cursor = connect.cursor()
     cursor.execute(
@@ -106,6 +147,28 @@ def spam_status_to_non_active(id_text):
     )
     connect.commit()
     connect.close()
+
+
+def get_source_url(text_id):
+
+    connect = psycopg2.connect(
+        database='forum_answers',
+        user='roman',
+        host='localhost',
+        password='admin'
+    )
+    cursor = connect.cursor()
+
+    cursor.execute(
+
+        "SELECT text.source_url "
+        "FROM texts_text AS text "
+        "WHERE text.id = {}".format(text_id)
+
+    )
+    url = cursor.fetchall()
+
+    return url
 
 
 if __name__ == "__main__":
