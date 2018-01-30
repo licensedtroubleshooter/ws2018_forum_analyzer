@@ -23,6 +23,7 @@ def texts_of_tag(tag):
     )
 
     texts = cursor.fetchall()
+    connect.close()
 
     return texts
 
@@ -45,11 +46,12 @@ def texts_of_cluster(cluster_id):
     )
 
     texts = cursor.fetchall()
+    connect.close()
 
     return texts
 
 
-def get_texts(id_list):
+def get_texts(list_id):
     """
         Итератор текстов из поступающего на вход списка идетификаторов
 
@@ -58,16 +60,56 @@ def get_texts(id_list):
                                host='localhost', password='admin')
 
     cursor = connect.cursor()
-    for item in id_list:
+    for item in list_id:
         cursor.execute(
 
-            "SELECT text.plain_text "
+            "SELECT text.plain_text, text.id "
             "FROM texts_text AS text "
             "WHERE text.id = {}".format(item[0])
 
         )
         yield cursor.fetchall()
+    connect.close()
+
+
+def spam_status_to_active(id_text):
+    """
+        Пометка о том, что текст является спамом
+
+    """
+    connect = psycopg2.connect(database='forum_answers', user='roman',
+                               host='localhost', password='admin')
+
+    cursor = connect.cursor()
+    cursor.execute(
+        "UPDATE texts_text "
+        "SET status = 2 "
+        "WHERE texts_text.id = {};".format(id_text)
+    )
+    connect.commit()
+    connect.close()
+
+
+def spam_status_to_non_active(id_text):
+    """
+            Убираем пометку о том, что текст является спамом
+
+    """
+    connect = psycopg2.connect(database='forum_answers', user='roman',
+                               host='localhost', password='admin')
+
+    cursor = connect.cursor()
+    cursor.execute(
+        "UPDATE texts_text "
+        "SET status = 0 "
+        "WHERE texts_text.id = {};".format(id_text)
+    )
+    connect.commit()
+    connect.close()
 
 
 if __name__ == "__main__":
     pass
+
+
+

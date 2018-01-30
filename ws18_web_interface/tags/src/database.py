@@ -21,6 +21,8 @@ def count_tags():
     )
 
     tag_count = cursor.fetchall()
+    connect.close()
+
     return tag_count
 
 

@@ -4,6 +4,7 @@ import psycopg2
 def count_clusters():
     """
         Подсчет количества текстов в каждом кластере
+        Возвращает описание кластера и количество текство в нем
 
     """
     connect = psycopg2.connect(database='forum_answers', user='roman',
@@ -19,5 +20,6 @@ def count_clusters():
     )
 
     clusters = cursor.fetchall()
+    connect.close()
 
     return clusters

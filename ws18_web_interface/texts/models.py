@@ -7,7 +7,8 @@ class Text(models.Model):
 
     plain_text = models.TextField(null=False)
     cluster = models.ForeignKey(Cluster, blank = True, null = True, on_delete = models.CASCADE)
-    source_url = models.CharField(max_length = 512, null = True, blank = True)
+    source_url = models.CharField(max_length = 512, null = True, blank = True, default = None)
+    status = models.SmallIntegerField(blank = False, default = 0)
 
     class Meta:
         verbose_name = "Text"
