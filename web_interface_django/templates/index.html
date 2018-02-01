@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Photo gallery</title>
+    <!-- {% load static %} -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css">
+
+</head>
+<body style="height: 100vh">
+<header>
+<nav class="navbar navbar-expand-lg bg-dark navbar-dark">
+
+      <ul class="navbar-nav active">
+        <li class="nav-item">
+          <a class="nav-link" href={%  url "choice" %}>Choice</a>
+        </li>
+      </ul>
+  </nav>
+</header>
+{% block choice %}{% endblock %}
+{% block tags %}{% endblock %}
+{% block texts_tag %}{% endblock %}
+{% block texts_cluster %}{% endblock %}
+{% block text_info %}{% endblock %}
+{% block clusters %}{% endblock %}
+
+
+</body>
+
+</html>

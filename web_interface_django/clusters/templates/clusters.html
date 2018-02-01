@@ -1,0 +1,9 @@
+{% extends 'index.html' %}
+{% block clusters %}
+    <div class="cluster_list" style="width: 600px; margin: 40px auto; text-align: center;">
+      {% for item in cluster_list %}
+          <p><a href="/clusters/{{ item.0 }}/">{{ item.1 }} ({{ item.2 }})</a></p>
+      {% endfor %}
+    </div>
+{% endblock %}
+
