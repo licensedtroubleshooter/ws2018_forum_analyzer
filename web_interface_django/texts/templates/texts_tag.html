@@ -1,0 +1,11 @@
+{% extends 'index.html' %}
+{% block texts_tag %}
+    <div class="text_list" style="width: 600px; margin: 40px auto; text-align: center;">
+      {% for item in texts %}
+          <a href="/texts/{{ item.0.1 }}/">
+              <p style="border: 2px solid black">{{ item.0.0 }}</p>
+          </a>
+      {% endfor %}
+    </div>
+{% endblock %}
+

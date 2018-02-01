@@ -1,0 +1,18 @@
+{% extends 'index.html' %}
+{% block text_info %}
+    <div class="text_info" style="width: 600px; margin: 40px auto; text-align: center;">
+
+        <p>{{ text.0.0 }}</p>
+        <span>Tags: </span>
+        {% for tag in tags %}
+            <a href="/tags/{{ tag.0 }}/">{{ tag.0 }}</a>
+            <span> </span>
+        {% endfor %}
+        <br/>
+        <span>Cluster: <a href="/clusters/{{ cluster.0.0 }}/">{{ cluster.0.1 }}</a></span>
+        <br/>
+        {% if url.0.0 %}
+            <a href="{{ url.0.0 }}">URL</a>
+        {% endif %}
+    </div>
+{% endblock %}

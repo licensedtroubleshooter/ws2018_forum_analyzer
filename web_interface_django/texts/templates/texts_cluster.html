@@ -1,0 +1,16 @@
+{% extends 'index.html' %}
+{% block texts_cluster %}
+    <div class="text_list" style="width: 600px; margin: 40px auto; text-align: center;">
+      {% for item in texts %}
+          <form action="" method="POST" style="border: 1px solid black; margin: 4px; padding: 4px;">
+              {% csrf_token %}
+              <a href="/texts/{{ item.0.1 }}/">
+                  <p>{{ item.0.0 }}</p>
+              </a>
+              <button type="submit" name="spam" value="{{ item.0.1 }}" class="btn btn-dark">Spam</button>
+          </form>
+
+      {% endfor %}
+    </div>
+{% endblock %}
+
