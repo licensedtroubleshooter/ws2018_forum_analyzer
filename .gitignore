@@ -1,2 +1,33 @@
-.idea
+;;extensions to ignore
+*.log
+*.pot
 *.pyc
+
+;;directories to ignore
+.idea/
+venv/
+frontend/
+
+*/__pycache__
+*/migrations
+
+.gitconfig
+git_stats/
+
+media/*
+**/bad_comments.csv
+**/comments.mm.index
+**/clusters.csv
+**/neg_pos_comments31.csv
+**/trash_model
+**/predictor_stop_wng_md_clear
+**/cluster_summaries_and_tags.csv
+**/trash_vectorizer
+**/comments_and_clusters.csv
+**/comments.csv
+**/tags_comments.csv
+**/comments.mm
+**/tags.csv
+**/comments.dict
+comments.dict
+_web
