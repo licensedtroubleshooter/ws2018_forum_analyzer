@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">    
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="description" content="The forums analizer">
+
+		<title>Forum Analyzer</title>
+        {% load static %}
+		<!-- Bootstrap core CSS -->
+		 <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+
+		<!-- Custom styles for this template -->
+		 <link rel="stylesheet" href="{% static 'css/cover.css' %}">
+        <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+		<style id="holderjs-style" type="text/css">
+			.modal-title{
+				color: #888888;
+			}
+		</style>
+	</head>
+	<body>	
+		<div id="myModal" class="modal fade">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<!-- Заголовок модального окна -->
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+						<h3 class="modal-title">About our project</h3>
+					</div>
+					<!-- Основное содержимое модального окна -->
+					<div class="modal-body">Содержимое модального окна...</div>
+					<!-- Футер модального окна -->
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
+					</div>
+				</div>
+			</div>
+		</div>	
+		<div class="site-wrapper">
+			<div class="site-wrapper-inner">
+				<div class="cover-container">
+					<div class="masthead clearfix">
+						<div class="inner">
+							<h3 class="masthead-brand">ws2018_forum_analyzer</h3>
+							<ul class="nav masthead-nav">
+								<li class="active"><a href={% url "choice" %}>Home</a></li>
+								<li class="active">
+									<a href="help.html" data-toggle="modal" data-target="#myModal">About</a>									
+								</li>																
+							</ul>
+						</div>
+					</div>
+					<div class="inner cover">
+						<h1 class="cover-heading">Know the shortcomings.</h1>
+						<p class="lead">Tags are the most popular words in responses. Clusters are the main topics, selected in comments.</p>
+						<p class="lead">						
+							<a href={% url "tags" %} style="display: inline-block; margin-right: 20px;" class="btn btn-lg btn-default">Tags</a>
+                            <a href={% url "clusters" %} class="btn btn-lg btn-default">Clusters</a>
+						</p>
+					</div>
+					<div class="mastfoot">
+						<div class="inner">
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- Bootstrap core JavaScript
+		================================================== -->
+		<!-- Placed at the end of the document so the pages load faster -->
+		<script src='{% static "js/jquery.min.js" %}'></script>
+        <script src='{% static "js/bootstrap.min.js" %}'></script>
+		<script src='{% static "js/docs.min.js" %}'></script>
+
+
+	</body>
+</html>

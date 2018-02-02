@@ -1,0 +1,33 @@
+{% extends 'show_result.html' %}
+{% block tags %}
+
+
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-sm-8 col-md-offset-2 main">
+					<h1 class="page-header" style="color: black">List of tags</h1>
+					<div class="table-responsive">
+						<table class="table table-striped">
+							<thead>
+								<tr>
+                                    <th style="color: black">Tag</th>
+									<th style="color: black">Count</th>
+								</tr>
+							</thead>
+							<tbody>
+
+                                    {% for item in tag_list %}
+                                        <tr>
+                                        <td><a href="/tags/{{ item.0 }}/">{{ item.0 }}</a></td>
+									    <td><span>{{ item.1 }}</span></td>
+                                        </tr>
+                                    {% endfor %}
+
+
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+{% endblock %}

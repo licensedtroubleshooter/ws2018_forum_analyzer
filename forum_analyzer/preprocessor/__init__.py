@@ -1,0 +1,6 @@
+# import pkg_resources
+from forum_analyzer.preprocessor import groups_parser
+from forum_analyzer.preprocessor.trash_preprocessor import trash_preprocessing
+from forum_analyzer.preprocessor.sentiment_preprocessor import sentiment_preprocessing
+
+# pkg_resources.declare_namespace(__name__)

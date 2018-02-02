@@ -1,0 +1,43 @@
+{% extends 'show_result.html' %}
+{% block text_info %}
+    <div class="container-fluid">
+                <div class="row">
+                    <div class="col-sm-8 col-md-offset-2 main">
+                        <h1 class="page-header">Information about comment</h1>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-8 col-md-offset-2 main">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <tbody>
+                                    <tr>
+                                        <td width="15%">Comment:</td>
+                                        <td><span>{{ text.0.0 }}</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td width="15%">Cluster:</td>
+                                        <td><a href="/clusters/{{ cluster.0.0 }}/" style="color: blue">{{ cluster.0.1 }}</a></td>
+                                    </tr>
+                                    <tr>
+                                        <td width="15%">Tags:</td>
+                                            <td>
+                                                {% for tag in tags %}
+                                                    <a href="/tags/{{ tag.0 }}/" style = "color: red;">{{ tag.0 }}</a>
+
+                                                {% endfor %}
+                                            </td>
+                                    </tr>
+                                    {% if url.0.0 %}
+                                        <tr>
+                                            <td width="15%">URL:</td>
+                                            <td> <a href="{{ url.0.0 }}">URL</a></td>
+                                        </tr>
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+{% endblock %}
