@@ -14,8 +14,8 @@ class Url(models.Model):
 class Text(models.Model):
 
     plain_text = models.TextField(null=False)
-    cluster = models.ForeignKey(Cluster, blank = True, null = True)
-    url = models.ForeignKey(Url, null = True, blank = True, default = None)
+    cluster = models.ForeignKey(Cluster, blank = True, null = True, on_delete=models.CASCADE)
+    url = models.ForeignKey(Url, null = True, blank = True, default = None, on_delete=models.CASCADE)
     status = models.SmallIntegerField(blank = False, default = 0)
     tonality = models.IntegerField(default=0)
 
