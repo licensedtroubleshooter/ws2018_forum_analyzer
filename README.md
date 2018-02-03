@@ -31,7 +31,7 @@
 
 Необходимо предустановить python, pip, virtualenv, PostgreSQL (с dev-пакетом)
 
-Установить компилятор языка python
+Для начала установим tkinker
 
 ```
 sudo apt-get install python3-tk
@@ -56,8 +56,33 @@ sourse ~/ws2018_forum_analyzer/venv/web/bin/activate
 ```
 Устанавливаем пакеты python
 ```
-pip scpy, numpy, 
+pip scpy, numpy, pandas, vk, catboost, psycopg2, scikit-learn, gensim, nltk, pymystem3, django==1.11.7
+```
+Входим в командную строку python
+
+```
+python
 ```
 
+Выполняем операции 
 
+```
+import nltk
+nltk.download('stopworld')
+exit()
+```
+
+Не знаю как написать 
+
+```
+cd ..
+```
+
+ ```
+ python manage.py makemigration
+ python manage.py makemigration text
+ python manage.py makemigration tags
+ python manage.py makemigratio makemigration clusters
+ python manage.py migrate
+ ```
 
