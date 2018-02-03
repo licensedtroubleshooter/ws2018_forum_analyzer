@@ -87,10 +87,14 @@ class CorpusCreator(object):
 
 class ClusterTopicsHelper(object):
     PATH = os.path.dirname(__file__)
+    RESOURCES_FOLDER = os.path.join(PATH, 'resources')
+
     CLUSTERS_FILENAME = os.path.join(PATH, 'resources', 'clusters.csv')
     TAGS_FILENAME = os.path.join(PATH, 'resources', 'tags.csv')
     COMMENTS_FILENAME = os.path.join(PATH, 'resources', 'comments.csv')
     TAGS_AND_COMMENTS = os.path.join(PATH, 'resources', 'tags_comments.csv')
+
+    MODELS_FILENAME = os.path.join(PATH, 'resources', 'comm')
 
     CLUSTER_IMAGES_FILENAME = os.path.join(PATH, os.path.join('resources', 'images'), 'cluster_image_{}.png')
 
@@ -127,11 +131,11 @@ class ClusterTopicsHelper(object):
             return self._get_frequencies_for_corpus()
         elif 'artm' == vectorizing_method:
             batch_vectorizer = None
-            if len(glob.glob(os.path.join('resources/comm', '*.batch'))) < 1:
-                batch_vectorizer = artm.BatchVectorizer(data_path='resources', data_format='bow_uci',
-                                                        collection_name='comm', target_folder='comm')
+            if len(glob.glob(os.path.join(self.MODELS_FILENAME, '*.batch'))) < 1:
+                batch_vectorizer = artm.BatchVectorizer(data_path=self.RESOURCES_FOLDER, data_format='bow_uci',
+                                                        collection_name='comm', target_folder=self.MODELS_FILENAME)
             else:
-                batch_vectorizer = artm.BatchVectorizer(data_path='resources/comm', data_format='batches')
+                batch_vectorizer = artm.BatchVectorizer(data_path=self.MODELS_FILENAME, data_format='batches')
 
             return {'batch_vectorizer': batch_vectorizer, 'dictionary': batch_vectorizer.dictionary}
 
@@ -317,7 +321,7 @@ class ClusterTopicsHelper(object):
         self._write_vocab_to_file(unique_words=unique_words)
 
     def _write_docword_to_file(self, num_of_doc, num_of_unique_words, num_of_all_words, words_per_doc_freq, unique_words):
-        with open('resources/docword.comm.txt', 'w') as f:
+        with open(os.path.join(self.RESOURCES_FOLDER, 'docword.comm.txt'), 'w') as f:
             f.write(str(num_of_doc))
             f.write('\n')
             f.write(str(num_of_unique_words))
@@ -337,7 +341,7 @@ class ClusterTopicsHelper(object):
                     f.write('\n')
 
     def _write_vocab_to_file(self, unique_words):
-        with open('resources/vocab.comm.txt', 'w') as f:
+        with open(os.path.join(self.RESOURCES_FOLDER, 'vocab.comm.txt'), 'w') as f:
             for key, v in unique_words.items():
                 f.write(key)
                 f.write('\n')
