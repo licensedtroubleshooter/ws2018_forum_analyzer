@@ -31,43 +31,44 @@
 
 Необходимо предустановить python, pip, virtualenv, PostgreSQL (с dev-пакетом)
 
-Для начала необходимо установить tkinker
+Для начала необходимо установить tkinker:
 
 ```
 sudo apt-get install python3-tk
 ```
 
-Склонировать репозиторий на сервер
+Клонировать репозиторий на сервер:
 
 ```
 git clone <ws2018_forum_analyzer> (ссылка?)
 ```
 
-Войти в папку 
+Войти в папку:
+
 ```
 cd ~/ws2018_forum_analyzer/venv
 ```
 
-Выполнить операции 
+Выполнить команды: 
 
 ```
 virtualenv -p python3 web
 sourse ~/ws2018_forum_analyzer/venv/web/bin/activate
 ```
 
-Устанавить пакеты python
+Устанавить пакеты python:
 
 ```
-pip scpy, numpy, pandas, vk, catboost, psycopg2, scikit-learn, gensim, nltk, pymystem3, django==1.11.7
+pip scpy numpy pandas vk catboost psycopg2 scikit-learn gensim nltk pymystem3 django==1.11.7
 ```
 
-Войти в командную строку python
+Войти в командную строку python:
 
 ```
 python
 ```
 
-Выполнить операции 
+Выполнить команды: 
 
 ```
 import nltk
@@ -75,13 +76,13 @@ nltk.download('stopworld')
 exit()
 ```
 
-Подняться на один уровень вверх относительно текущего каталога
+Подняться на один уровень вверх относительно текущего каталога:
 
 ```
 cd ..
 ```
 
-Выполнить операции 
+Выполнить операции:
 
  ```
  python manage.py makemigration
