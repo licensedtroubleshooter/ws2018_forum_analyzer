@@ -138,18 +138,18 @@ class ClusterTopicsHelper(object):
         self._save_tag_comment(tag_comment)
 
 
-    def _get_corpus_vector_representation(self, vectorizing_method='sklearn'):
+    def _get_corpus_vector_representation(self, vectorizing_method='artm'):
         if 'gensim' == vectorizing_method:
             return self._get_tfidf_for_corpus()
         elif 'sklearn' == vectorizing_method:
             return self._get_frequencies_for_corpus()
         elif 'artm' == vectorizing_method:
             batch_vectorizer = None
-            if len(glob.glob(os.path.join(self.MODELS_FILENAME, '*.batch'))) < 1:
-                batch_vectorizer = artm.BatchVectorizer(data_path=self.RESOURCES_FOLDER, data_format='bow_uci',
+            #if len(glob.glob(os.path.join(self.MODELS_FILENAME, '*.batch'))) < 1:
+            batch_vectorizer = artm.BatchVectorizer(data_path=self.RESOURCES_FOLDER, data_format='bow_uci',
                                                         collection_name='comm', target_folder=self.MODELS_FILENAME)
-            else:
-                batch_vectorizer = artm.BatchVectorizer(data_path=self.MODELS_FILENAME, data_format='batches')
+            #else:
+            #    batch_vectorizer = artm.BatchVectorizer(data_path=self.MODELS_FILENAME, data_format='batches')
 
             return {'batch_vectorizer': batch_vectorizer, 'dictionary': batch_vectorizer.dictionary}
 
