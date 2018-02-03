@@ -1,6 +1,7 @@
 import os
 import artm
 import re
+import glob
 import pymystem3
 
 import numpy as np
@@ -33,7 +34,8 @@ class DictionaryCreator(object):
         self.stop_words = set(stopwords.words('russian'))
         ext = ['еще', 'него', 'сказать', 'а', 'ж', 'нее', 'со', 'же', 'ней', 'более', 'жизнь', 'нельзя', 'так', 'за', 'такой',
                'зачем', 'ни', 'там', 'будто', 'здесь', 'нибудь', 'тебя', 'бы', 'и', 'никогда', 'тем', 'был', 'из', 'ним', 'теперь',
-               'была','из-за', 'них', 'то', 'были', 'или', 'но', 'ну', 'в', 'на', 'как', 'ксения', 'бла']
+               'была','из-за', 'них', 'то', 'были', 'или', 'но', 'ну', 'в', 'на', 'как', 'ксения', 'бла', 'это', 'очень']
+
         self.stop_words.update(ext)
 
     def create_dictionary_from_texts(self, texts):
@@ -99,17 +101,12 @@ class ClusterTopicsHelper(object):
         self.corpus = corpus
         self.num_of_clusters = 5
 
-    def cluster_texts(self, clustering_method='sk_LDA', vectorizing_method='sk_count'):
+    def cluster_texts(self, clustering_method='artm', vectorizing_method='artm'):
+        self._make_uci_dataset_from_corpus()
 
-        if 'gs_tfidf' == vectorizing_method:
-            corpus_vector_spaced = self._get_tfidf_for_corpus()
-        elif 'sk_count' == vectorizing_method:
-            corpus_vector_spaced = self._get_frequencies_for_corpus()
+        corpus_vector_spaced = self._get_corpus_vector_representation(vectorizing_method)
 
-        if 'gs_LSI' == clustering_method:
-            corpus_modeled = self._get_model_LSI(corpus_vector_spaced)
-        elif 'sk_LDA' == clustering_method:
-            corpus_modeled = self._get_model_LDA(corpus_vector_spaced)
+        corpus_modeled = self._get_corpus_model(corpus_vector_spaced, clustering_method)
 
         comments_clusters = self._get_comments_clusters(corpus_modeled)
         self._save_comments(comments_clusters)
@@ -122,6 +119,53 @@ class ClusterTopicsHelper(object):
 
         tag_comment = self._get_tags_for_comments(tags)
         self._save_tag_comment(tag_comment)
+
+    def _get_corpus_vector_representation(self, vectorizing_method='sklearn'):
+        if 'gensim' == vectorizing_method:
+            return self._get_tfidf_for_corpus()
+        elif 'sklearn' == vectorizing_method:
+            return self._get_frequencies_for_corpus()
+        elif 'artm' == vectorizing_method:
+            batch_vectorizer = None
+            if len(glob.glob(os.path.join('resources/comm', '*.batch'))) < 1:
+                batch_vectorizer = artm.BatchVectorizer(data_path='resources', data_format='bow_uci',
+                                                        collection_name='comm', target_folder='comm')
+            else:
+                batch_vectorizer = artm.BatchVectorizer(data_path='resources/comm', data_format='batches')
+
+            return {'batch_vectorizer': batch_vectorizer, 'dictionary': batch_vectorizer.dictionary}
+
+    def _get_corpus_model(self, corpus_vector_spaced, clustering_method='artm'):
+        if 'gensim' == clustering_method:
+            return self._get_model_LSI(corpus_vector_spaced)
+        elif 'sklearn' == clustering_method:
+            return self._get_model_LDA(corpus_vector_spaced)
+        elif 'artm' == clustering_method:
+            batch_vectorizer = corpus_vector_spaced['batch_vectorizer']
+            dictionary = corpus_vector_spaced['dictionary']
+
+            topic_names = ['topic_{}'.format(i) for i in range(self.num_of_clusters)]
+
+            model_artm = artm.ARTM(topic_names=topic_names, cache_theta=True,
+                                   scores=[artm.PerplexityScore(name='PerplexityScore', dictionary=dictionary)],
+                                   regularizers=[artm.SmoothSparseThetaRegularizer(name='SparseTheta', tau=-0.15)])
+
+            model_artm.scores.add(artm.SparsityPhiScore(name='SparsityPhiScore'))
+            model_artm.scores.add(artm.SparsityThetaScore(name='SparsityThetaScore'))
+            model_artm.scores.add(artm.TopicKernelScore(name='TopicKernelScore', probability_mass_threshold=0.3))
+            model_artm.scores.add(artm.TopTokensScore(name='TopTokensScore', num_tokens=10), overwrite=True)
+
+            model_artm.regularizers.add(artm.SmoothSparsePhiRegularizer(name='SparsePhi', tau=-0.1))
+            model_artm.regularizers['SparseTheta'].tau = -0.2
+            model_artm.regularizers.add(artm.DecorrelatorPhiRegularizer(name='DecorrelatorPhi', tau=1.5e+5))
+
+            model_artm.num_document_passes = 1
+
+            model_artm.initialize(dictionary)
+            model_artm.fit_offline(batch_vectorizer=batch_vectorizer, num_collection_passes=30)
+
+            return model_artm.transform(batch_vectorizer=batch_vectorizer).T
+
 
     def _save_comments(self, comments_clusters):
         comments_clusters_df = pd.DataFrame(comments_clusters)
@@ -221,15 +265,18 @@ class ClusterTopicsHelper(object):
                                         random_state=1)
         return lda.fit_transform(corpus)
 
-    def _get_comments_clusters(self, corpus_model, model='sk'):
+    def _get_comments_clusters(self, corpus_model, model='artm'):
         comments_clusters = []
 
-        if 'sk' == model:
+        if 'sklearn' == model:
             for i, doc in enumerate(corpus_model):
                 comments_clusters.append((i, sorted(zip(range(len(doc)), doc), key=itemgetter(1), reverse=True)[0][0]))
-        elif 'gs' == model:
+        elif 'gensim' == model:
             for i, doc in enumerate(corpus_model):
                 comments_clusters.append((i, sorted(doc, key=itemgetter(1), reverse=True)[0][0]))
+        elif 'artm' == model:
+            for i, doc in enumerate(corpus_model.values):
+                comments_clusters.append((i, sorted(zip(range(len(doc)), doc), key=itemgetter(1), reverse=True)[0][0]))
 
         return comments_clusters
 
@@ -242,30 +289,24 @@ class ClusterTopicsHelper(object):
 
         return tag_comment
 
-    def _make_uci_dataset_from_csv(self):
-        def clean_data(df):
-            plain_publications = [text.strip().lower() for text in df['text'].tolist()]
-            for i, publication in enumerate(plain_publications):
-                plain_publications[i] = ' '.join(list(filter(None, re.split('[^а-я]', publication))))
+    def _make_uci_dataset_from_corpus(self):
+        num_of_doc = len(self.corpus.texts)
 
-            return plain_publications
-
-        self.df['text'] = clean_data(self.df)
-        num_of_doc = self.df.shape[0]
-
-        # Count word frequenses per document
-        words_per_doc_freq = dict(self.df['text'].apply(lambda x: Counter(x.lower().split())))
+        # Count word frequences per document
+        words_per_doc_freq = dict(enumerate([dict(Counter(x.lower().split())) for x in self.corpus.texts]))
         for k, v in words_per_doc_freq.items():
             words_per_doc_freq[k] = dict(v)
 
         # Count num of unique words
         unique_words = set()
-        self.df['text'].str.lower().str.split().apply(unique_words.update)
+        for text in self.corpus.texts:
+            unique_words.update(text.split())
+
         unique_words = dict(zip(unique_words, range(1, len(unique_words) + 1)))
         num_of_unique_words = len(unique_words)
 
         # Count num of all words
-        num_of_all_words = len(' '.join(self.df['text'].tolist()).split(' '))
+        num_of_all_words = len(' '.join(self.corpus.texts).split(' '))
 
         self._write_docword_to_file(num_of_doc=num_of_doc,
                                     num_of_unique_words=num_of_unique_words,
@@ -276,7 +317,7 @@ class ClusterTopicsHelper(object):
         self._write_vocab_to_file(unique_words=unique_words)
 
     def _write_docword_to_file(self, num_of_doc, num_of_unique_words, num_of_all_words, words_per_doc_freq, unique_words):
-        with open('docword.corpus.txt', 'w') as f:
+        with open('resources/docword.comm.txt', 'w') as f:
             f.write(str(num_of_doc))
             f.write('\n')
             f.write(str(num_of_unique_words))
@@ -296,11 +337,10 @@ class ClusterTopicsHelper(object):
                     f.write('\n')
 
     def _write_vocab_to_file(self, unique_words):
-        with open('vocab.corpus.txt', 'w') as f:
+        with open('resources/vocab.comm.txt', 'w') as f:
             for key, v in unique_words.items():
                 f.write(key)
                 f.write('\n')
-
 
 if __name__ == '__main__':
     cleaner = DatasetCleaner(csv_path='../neg_comments_t_50000.csv')
