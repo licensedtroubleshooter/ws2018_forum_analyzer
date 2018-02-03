@@ -26,7 +26,38 @@
   Forum Analyzer предоставляется в виде web-сайта.
 
 ## Сборка
-.....
- 
+
+#### Требования
+
+Необходимо предустановить python, pip, virtualenv, PostgreSQL (с dev-пакетом)
+
+Установить компилятор языка python
+
+```
+sudo apt-get install python3-tk
+```
+Склонировать репозиторий на сервер
+
+```
+git clone <ws2018_forum_analyzer> (ссылка?)
+```
+
+Войти в папку 
+```
+cd ~/ws2018_forum_analyzer/venv
+```
+
+```
+virtualenv -p python3 web
+```
+
+```
+sourse ~/ws2018_forum_analyzer/venv/web/bin/activate
+```
+Устанавливаем пакеты python
+```
+pip scpy, numpy, 
+```
+
 
 
