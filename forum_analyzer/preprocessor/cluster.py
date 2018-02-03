@@ -1,16 +1,19 @@
 import os
-# import artm
+import artm
 import re
 import pymystem3
-from operator import itemgetter
 
 import numpy as np
 import pandas as pd
 
+from wordcloud import WordCloud
+from operator import itemgetter
 from collections import Counter, defaultdict
 from gensim import corpora, models
 from gensim.summarization import summarize, keywords
 from nltk.corpus import stopwords
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.decomposition import LatentDirichletAllocation
 
 
 class DatasetCleaner(object):
@@ -28,6 +31,10 @@ class DatasetCleaner(object):
 class DictionaryCreator(object):
     def __init__(self):
         self.stop_words = set(stopwords.words('russian'))
+        ext = ['еще', 'него', 'сказать', 'а', 'ж', 'нее', 'со', 'же', 'ней', 'более', 'жизнь', 'нельзя', 'так', 'за', 'такой',
+               'зачем', 'ни', 'там', 'будто', 'здесь', 'нибудь', 'тебя', 'бы', 'и', 'никогда', 'тем', 'был', 'из', 'ним', 'теперь',
+               'была','из-за', 'них', 'то', 'были', 'или', 'но', 'ну', 'в', 'на', 'как', 'ксения', 'бла']
+        self.stop_words.update(ext)
 
     def create_dictionary_from_texts(self, texts):
         texts = self._remove_stop_words(texts)
@@ -57,6 +64,7 @@ class DictionaryCreator(object):
         mystem = pymystem3.Mystem()
         return [[mystem.lemmatize(token)[0] for token in text] for text in texts]
 
+
 class CorpusCreator(object):
     PATH = os.path.dirname(__file__)
     COMMENTS_DICT_FILE_NAME = os.path.join(PATH, 'resources', "comments.dict")
@@ -73,6 +81,7 @@ class CorpusCreator(object):
             corpora.MmCorpus.serialize(self.COMMENTS_MM_FILE_NAME, self.corpus)
 
         self.texts = np.asarray(texts)
+        self.stop_words = DictionaryCreator().stop_words
 
 class ClusterTopicsHelper(object):
     PATH = os.path.dirname(__file__)
@@ -81,6 +90,8 @@ class ClusterTopicsHelper(object):
     COMMENTS_FILENAME = os.path.join(PATH, 'resources', 'comments.csv')
     TAGS_AND_COMMENTS = os.path.join(PATH, 'resources', 'tags_comments.csv')
 
+    CLUSTER_IMAGES_FILENAME = os.path.join(PATH, os.path.join('resources', 'images'), 'cluster_image_{}.png')
+
     ERROR_NOT_ENOUGH_POSTS_FOR_SUMMARY = 'Summary is not available for this cluster.'
     ERROR_NOT_ENOUGH_POSTS_FOR_TAGS = 'Keywords are not available for this cluster.'
 
@@ -88,12 +99,16 @@ class ClusterTopicsHelper(object):
         self.corpus = corpus
         self.num_of_clusters = 5
 
-    def cluster_texts(self, method='LDA'):
-        corpus_vector_spaced = self._get_tfidf_for_corpus()
+    def cluster_texts(self, clustering_method='sk_LDA', vectorizing_method='sk_count'):
 
-        if 'LSI' == method:
+        if 'gs_tfidf' == vectorizing_method:
+            corpus_vector_spaced = self._get_tfidf_for_corpus()
+        elif 'sk_count' == vectorizing_method:
+            corpus_vector_spaced = self._get_frequencies_for_corpus()
+
+        if 'gs_LSI' == clustering_method:
             corpus_modeled = self._get_model_LSI(corpus_vector_spaced)
-        else:
+        elif 'sk_LDA' == clustering_method:
             corpus_modeled = self._get_model_LDA(corpus_vector_spaced)
 
         comments_clusters = self._get_comments_clusters(corpus_modeled)
@@ -116,11 +131,17 @@ class ClusterTopicsHelper(object):
 
         comments_clusters_df.to_csv(self.COMMENTS_FILENAME, encoding='UTF-8')
 
-    def _save_cluster(self, cluster):
-        cluster_df = pd.DataFrame(cluster)
+    def _save_cluster(self, clusters):
+        cluster_df = pd.DataFrame(clusters)
         cluster_df.columns = ['cluster_id', 'summary']
 
         print(cluster_df.head())
+
+        wordcloud = WordCloud(background_color='white', stopwords=self.corpus.stop_words)
+        for cluster in clusters:
+            wordcloud.generate(cluster[1])
+            image = wordcloud.to_image()
+            image.save(self.CLUSTER_IMAGES_FILENAME.format(cluster[0]))
 
         cluster_df.to_csv(self.CLUSTERS_FILENAME, encoding='UTF-8')
 
@@ -176,23 +197,39 @@ class ClusterTopicsHelper(object):
 
             summaries.append(cluster_summary)
 
-        return list(enumerate(keywords(' '.join(summaries), split=True, words=15)))
+        summaries = [' '.join([word for word in text.lower().split() if word not in self.corpus.stop_words]) for text in summaries]
+
+        return list(enumerate(keywords('. '.join(summaries), split=True, words=15)))
 
     def _get_tfidf_for_corpus(self):
         return models.TfidfModel(self.corpus.corpus, normalize=True)[self.corpus.corpus]
 
+    def _get_frequencies_for_corpus(self):
+        tf_vectorizer = CountVectorizer(max_df=0.6, min_df=10, max_features=1000, ngram_range=(1, 4),
+                                        stop_words=self.corpus.stop_words)
+        return tf_vectorizer.fit_transform(self.corpus.texts)
+
     def _get_model_LSI(self, tfidf_corpus):
-        lsi = models.LdaModel(tfidf_corpus, id2word=self.corpus.dictionary, num_topics=5)
+        lsi = models.LdaModel(tfidf_corpus, id2word=self.corpus.dictionary, num_topics=self.num_of_clusters)
         return lsi[tfidf_corpus]
 
     def _get_model_LDA(self, corpus):
-        lda = models.LdaModel(corpus, id2word=self.corpus.dictionary, num_topics=5)
-        return lda[corpus]
+        #lda = models.LdaModel(corpus, id2word=self.corpus.dictionary, num_topics=5, alpha='auto', eval_every=50)
+        lda = LatentDirichletAllocation(n_topics=self.num_of_clusters, max_iter=20,
+                                        learning_method='online',
+                                        learning_offset=50.,
+                                        random_state=1)
+        return lda.fit_transform(corpus)
 
-    def _get_comments_clusters(self, corpus_model):
+    def _get_comments_clusters(self, corpus_model, model='sk'):
         comments_clusters = []
-        for i, doc in enumerate(corpus_model):
-            comments_clusters.append((i, sorted(doc, key=itemgetter(1), reverse=True)[0][0]))
+
+        if 'sk' == model:
+            for i, doc in enumerate(corpus_model):
+                comments_clusters.append((i, sorted(zip(range(len(doc)), doc), key=itemgetter(1), reverse=True)[0][0]))
+        elif 'gs' == model:
+            for i, doc in enumerate(corpus_model):
+                comments_clusters.append((i, sorted(doc, key=itemgetter(1), reverse=True)[0][0]))
 
         return comments_clusters
 
@@ -269,7 +306,7 @@ if __name__ == '__main__':
     cleaner = DatasetCleaner(csv_path='../neg_comments_t_50000.csv')
     plain_publications = cleaner.clean_texts_from_junk()
 
-    dictionary = DictionaryCreator().create_dictionary_from_texts(plain_publications)
+    dictionary = DictionaryCreator().create_dictionary_from_texts(' '.join(plain_publications))
 
     corpus = CorpusCreator(plain_publications, dictionary)
 
