@@ -29,5 +29,6 @@ media/*
 **/comments.mm
 **/tags.csv
 **/comments.dict
+**.png
 comments.dict
 _web
