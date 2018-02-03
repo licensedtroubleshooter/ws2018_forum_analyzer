@@ -32,9 +32,12 @@ class DatasetCleaner(object):
 class DictionaryCreator(object):
     def __init__(self):
         self.stop_words = set(stopwords.words('russian'))
-        ext = ['еще', 'него', 'сказать', 'а', 'ж', 'нее', 'со', 'же', 'ней', 'более', 'жизнь', 'нельзя', 'так', 'за', 'такой',
-               'зачем', 'ни', 'там', 'будто', 'здесь', 'нибудь', 'тебя', 'бы', 'и', 'никогда', 'тем', 'был', 'из', 'ним', 'теперь',
-               'была','из-за', 'них', 'то', 'были', 'или', 'но', 'ну', 'в', 'на', 'как', 'ксения', 'бла', 'это', 'очень']
+        ext = ['еще', 'него', 'сказать', 'а', 'ж', 'нее', 'со', 'же', 'ней', 'более', 'жизнь', 'нельзя', 'так', 'за',
+               'такой',
+               'зачем', 'ни', 'там', 'будто', 'здесь', 'нибудь', 'тебя', 'бы', 'и', 'никогда', 'тем', 'был', 'из',
+               'ним', 'теперь',
+               'была', 'из-за', 'них', 'то', 'были', 'или', 'но', 'ну', 'в', 'на', 'как', 'ксения', 'бла', 'это',
+               'очень']
 
         self.stop_words.update(ext)
 
@@ -44,6 +47,13 @@ class DictionaryCreator(object):
         texts = self._lemmatize_words(texts)
 
         return self._create_and_save_dictionary(texts)
+
+    def get_texts_clean(self, texts):
+        texts = self._remove_stop_words(texts)
+        texts = self._remove_words_that_appear_only_once(texts)
+        texts = self._lemmatize_words(texts)
+
+        return texts
 
     def _remove_stop_words(self, texts):
         return [[word for word in text.lower().split() if word not in self.stop_words] for text in texts]
@@ -85,6 +95,7 @@ class CorpusCreator(object):
         self.texts = np.asarray(texts)
         self.stop_words = DictionaryCreator().stop_words
 
+
 class ClusterTopicsHelper(object):
     PATH = os.path.dirname(__file__)
     RESOURCES_FOLDER = os.path.join(PATH, 'resources')
@@ -104,6 +115,8 @@ class ClusterTopicsHelper(object):
     def __init__(self, corpus):
         self.corpus = corpus
         self.num_of_clusters = 5
+        self.num_of_texts_for_keywords = 500
+        self.num_of_keywords_to_extract = 500
 
     def cluster_texts(self, clustering_method='artm', vectorizing_method='artm'):
         self._make_uci_dataset_from_corpus()
@@ -118,11 +131,12 @@ class ClusterTopicsHelper(object):
         cluster_summaries = self._get_cluster_summaries(comments_clusters)
         self._save_cluster(cluster_summaries)
 
-        tags = self._get_tags_from_cluster_summaries(cluster_summaries)
+        tags = self._get_keywords_for_corpus()
         self._save_tags(tags)
 
         tag_comment = self._get_tags_for_comments(tags)
         self._save_tag_comment(tag_comment)
+
 
     def _get_corpus_vector_representation(self, vectorizing_method='sklearn'):
         if 'gensim' == vectorizing_method:
@@ -170,7 +184,6 @@ class ClusterTopicsHelper(object):
 
             return model_artm.transform(batch_vectorizer=batch_vectorizer).T
 
-
     def _save_comments(self, comments_clusters):
         comments_clusters_df = pd.DataFrame(comments_clusters)
         comments_clusters_df.columns = ['comment_id', 'cluster_id']
@@ -184,12 +197,6 @@ class ClusterTopicsHelper(object):
         cluster_df.columns = ['cluster_id', 'summary']
 
         print(cluster_df.head())
-
-        wordcloud = WordCloud(background_color='white', stopwords=self.corpus.stop_words)
-        for cluster in clusters:
-            wordcloud.generate(cluster[1])
-            image = wordcloud.to_image()
-            image.save(self.CLUSTER_IMAGES_FILENAME.format(cluster[0]))
 
         cluster_df.to_csv(self.CLUSTERS_FILENAME, encoding='UTF-8')
 
@@ -220,7 +227,6 @@ class ClusterTopicsHelper(object):
         for text_id, cluster_id in comments_clusters:
             clusters_with_summaries[cluster_id]['post_ids'].append(text_id)
 
-
         for cluster_id in clusters_with_summaries.keys():
             num_of_cluster_sentences = len(clusters_with_summaries[cluster_id]['post_ids'])
             if num_of_cluster_sentences < 10:
@@ -229,7 +235,6 @@ class ClusterTopicsHelper(object):
             random_text_from_cluster = '. '.join(self.corpus.texts[np.random.choice(num_of_cluster_sentences, 10)])
 
             clusters_with_summaries[cluster_id]['summary'] = summarize(random_text_from_cluster, word_count=150)
-
 
         cluster_summaries = []
         for i in range(self.num_of_clusters):
@@ -245,9 +250,26 @@ class ClusterTopicsHelper(object):
 
             summaries.append(cluster_summary)
 
-        summaries = [' '.join([word for word in text.lower().split() if word not in self.corpus.stop_words]) for text in summaries]
+        summaries = [' '.join([word for word in text.lower().split() if word not in self.corpus.stop_words]) for text in
+                     summaries]
 
         return list(enumerate(keywords('. '.join(summaries), split=True, words=15)))
+
+    def _get_keywords_for_corpus(self):
+        posts = []
+        for text in DictionaryCreator().get_texts_clean(self.corpus.texts):
+            posts.append('. '.join(text))
+
+        posts = np.asarray(posts)
+        num_of_corpus_sentences = len(posts)
+        text_for_corpus = '. '.join(posts[np.random.choice(num_of_corpus_sentences, self.num_of_keywords_to_extract)])
+
+        wordcloud = WordCloud(stopwords=self.corpus.stop_words)
+        wordcloud.generate(text_for_corpus)
+        image = wordcloud.to_image()
+        image.save(self.CLUSTER_IMAGES_FILENAME.format('corpus'))
+
+        return list(enumerate(keywords(text_for_corpus, split=True, words=self.num_of_keywords_to_extract)))
 
     def _get_tfidf_for_corpus(self):
         return models.TfidfModel(self.corpus.corpus, normalize=True)[self.corpus.corpus]
@@ -262,7 +284,7 @@ class ClusterTopicsHelper(object):
         return lsi[tfidf_corpus]
 
     def _get_model_LDA(self, corpus):
-        #lda = models.LdaModel(corpus, id2word=self.corpus.dictionary, num_topics=5, alpha='auto', eval_every=50)
+        # lda = models.LdaModel(corpus, id2word=self.corpus.dictionary, num_topics=5, alpha='auto', eval_every=50)
         lda = LatentDirichletAllocation(n_topics=self.num_of_clusters, max_iter=20,
                                         learning_method='online',
                                         learning_offset=50.,
@@ -320,7 +342,8 @@ class ClusterTopicsHelper(object):
 
         self._write_vocab_to_file(unique_words=unique_words)
 
-    def _write_docword_to_file(self, num_of_doc, num_of_unique_words, num_of_all_words, words_per_doc_freq, unique_words):
+    def _write_docword_to_file(self, num_of_doc, num_of_unique_words, num_of_all_words, words_per_doc_freq,
+                               unique_words):
         with open(os.path.join(self.RESOURCES_FOLDER, 'docword.comm.txt'), 'w') as f:
             f.write(str(num_of_doc))
             f.write('\n')
