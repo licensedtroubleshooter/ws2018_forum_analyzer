@@ -3,7 +3,12 @@
     <div class="container-fluid">
 			<div class="row">
 				<div class="col-sm-8 col-md-offset-2 main">
-					<h1 class="page-header">List of comments in this cluster</h1>
+					<h1 class="page-header">
+                        List of comments in cluster
+                        <span style="color: darkblue;">
+                            '{{ summary.0.0 }}'
+                        </span>
+                    </h1>
 					<div class="table-responsive">
 						<table class="table table-striped">
 							<tbody>
@@ -12,13 +17,13 @@
                                     <form action="" method="POST" style="border: 1px solid black; margin: 4px; padding: 4px;">
                                     {% csrf_token %}
                                         <td>
-                                            <a href="/texts/{{ item.0.1 }}/">
+                                            <a href={% url 'text_info' url_id item.0.1 %}>
                                                 <p>{{ item.0.0 }}</p>
                                             </a>
                                         </td>
                                         <td>
                                             <button type="submit" name="spam" value="{{ item.0.1 }}"
-                                                    class="btn btn-danger">Spam</button>
+                                                    class="spam btn btn-danger">Spam</button>
                                         </td>
                                     </form>
 								</tr>
@@ -29,4 +34,5 @@
 				</div>
 			</div>
 		</div>
+
 {% endblock %}

@@ -6,7 +6,7 @@ import vk
 MAX_COUNT_COMMENTS = 100  # ограничение VK
 
 
-def save_comments_to_csv(group: str, path='.') -> str:
+def save_comments_to_csv(group, path='.'):
     print('start load comments from group...')
     clean_pattern1 = re.compile('\'')
     clean_pattern2 = re.compile('<[^>]*>')

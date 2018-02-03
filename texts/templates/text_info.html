@@ -11,23 +11,28 @@
                         <div class="table-responsive">
                             <table class="table table-striped">
                                 <tbody>
+
                                     <tr>
                                         <td width="15%">Comment:</td>
                                         <td><span>{{ text.0.0 }}</span></td>
                                     </tr>
+                                    {% if cluster %}
                                     <tr>
                                         <td width="15%">Cluster:</td>
-                                        <td><a href="/clusters/{{ cluster.0.0 }}/" style="color: blue">{{ cluster.0.1 }}</a></td>
+                                        <td><a href={% url 'texts_cluster' url_id cluster.0.0 %} style="color: blue">{{ cluster.0.1 }}</a></td>
                                     </tr>
+                                    {% endif %}
+                                    {% if tags %}
                                     <tr>
                                         <td width="15%">Tags:</td>
                                             <td>
                                                 {% for tag in tags %}
-                                                    <a href="/tags/{{ tag.0 }}/" style = "color: red;">{{ tag.0 }}</a>
+                                                    <a href={% url 'texts_tag' url_id tag.0 %} style = "color: red;">{{ tag.0 }}</a>
 
                                                 {% endfor %}
                                             </td>
                                     </tr>
+                                    {% endif %}
                                     {% if url.0.0 %}
                                         <tr>
                                             <td width="15%">URL:</td>

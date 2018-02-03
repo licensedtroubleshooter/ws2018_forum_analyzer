@@ -59,6 +59,9 @@ def write_to_csv(df, neg_ar, pos_ar, path='.'):
     frames = [new_df_neg, new_df_pos]
     df_all = pd.concat(frames)
 
+    df_all['likes'] = df_all['likes'].astype(int)
+    df_all['status'] = df_all['status'].astype(int)
+
     df_all.to_csv(os.path.join(path, 'neg_pos_comments31.csv'), index=False)
     return os.path.join(path, 'neg_pos_comments31.csv')
 
@@ -74,7 +77,7 @@ def sentiment_analysis(path='.', train='train.csv'):
         sem_an = model.predict(count_vect.transform([df['text'].loc[i]]))
         if sem_an < 0.4:
             a_neg.append(i)
-        if sem_an > 1:
+        if sem_an > 2:
             a_pos.append(i)
 
     os.remove(train)

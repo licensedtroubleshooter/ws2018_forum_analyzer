@@ -18,7 +18,7 @@
 
                                     {% for item in tag_list %}
                                         <tr>
-                                        <td><a href="/tags/{{ item.0 }}/">{{ item.0 }}</a></td>
+                                        <td><a href={% url 'texts_tag' url_id item.0 %}>{{ item.0 }}</a></td>
 									    <td><span>{{ item.1 }}</span></td>
                                         </tr>
                                     {% endfor %}

@@ -16,7 +16,7 @@
                                     {% for item in cluster_list %}
                                         <tr>
 
-                                            <td><a href="/clusters/{{ item.0 }}/">{{ item.1 }}</a></td>
+                                            <td><a href={% url 'texts_cluster' url_id item.0 %}>{{ item.1 }}</a></td>
                                             <td><span>{{ item.2 }}</span></td>
 
                                         </tr>

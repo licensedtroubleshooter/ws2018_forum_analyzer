@@ -48,12 +48,12 @@
 		<div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
 			<div class="container-fluid">
 				<div class="navbar-header">
-					<a class="navbar-brand" href={% url "choice" %}>ws2018_forum_analyzer</a>
+					<a class="navbar-brand" href={% url "index" %}>ws2018_forum_analyzer</a>
 				</div>
 				<div class="navbar-collapse collapse">
 					<ul class="nav navbar-nav navbar-right">
 						<li><a href="#" data-toggle="modal" data-target="#myModal">About</a></li>
-						<li><a href={% url "choice" %}>Home</a></li>
+						<li><a href={% url "index" %}>Home</a></li>
 					</ul>
 				</div>
 			</div>
@@ -63,10 +63,23 @@
         {% block text_info %}{% endblock %}
         {% block clusters %}{% endblock %}
         {% block texts_cluster %}{% endblock %}
+        {% block urls %}{% endblock %}
 
 		<script src='{% static "js/jquery.min.js" %}'></script>
         <script src='{% static "js/bootstrap.min.js" %}'></script>
 		<script src='{% static "js/docs.min.js" %}'></script>
+        <script>
+				$('button.spam').on('click', function() {
+					$(this).addClass('hidden');
+					$(this).parents('tr').addClass('danger');
+				});
+			</script>
+        <script>
+            $('button.delete').on('click', function() {
+                $(this).addClass('hidden');
+                $(this).parents('tr').addClass('hidden');
 
+            });
+        </script>
 	</body>
 </html>

@@ -2,7 +2,7 @@ import psycopg2
 from src.database import get_connect
 
 
-def count_tags():
+def count_tags(url_id):
     """
         Получаем список из тегов и количество их уникальных вхождений
 
@@ -16,7 +16,12 @@ def count_tags():
         "FROM tags_tag AS tag "
         "INNER JOIN texts_tagtext AS tagtext "
             "ON tag.id = tagtext.tag_id "
-        "GROUP BY tag.name;"
+        "INNER JOIN texts_text AS text "
+            "ON text.id = tagtext.text_id "
+        "INNER JOIN texts_url AS url "
+            "ON text.url_id = url.id "
+        "WHERE url.id = {} "
+        "GROUP BY tag.name;".format(url_id)
 
     )
 

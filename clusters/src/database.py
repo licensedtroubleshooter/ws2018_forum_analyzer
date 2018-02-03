@@ -2,7 +2,7 @@ import psycopg2
 from src.database import get_connect
 
 
-def count_clusters():
+def count_clusters(url_id):
     """
         Подсчет количества текстов в каждом кластере
         Возвращает описание кластера и количество текство в нем
@@ -14,9 +14,12 @@ def count_clusters():
     cursor.execute(
         "SELECT cluster.id, cluster.summary, count(*) "
         "FROM clusters_cluster AS cluster "
-        "LEFT JOIN texts_text AS text "
-        "ON cluster.id = text.cluster_id "
-        "GROUP BY cluster.summary, cluster.id;"
+        "INNER JOIN texts_text AS text "
+            "ON cluster.id = text.cluster_id "
+        "INNER JOIN texts_url AS url "
+            "ON text.url_id = url.id "
+        "WHERE url.id = {} "
+        "GROUP BY cluster.summary, cluster.id;".format(url_id)
     )
 
     clusters = cursor.fetchall()

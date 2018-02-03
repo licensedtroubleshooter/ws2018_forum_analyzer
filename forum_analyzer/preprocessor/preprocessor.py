@@ -5,7 +5,7 @@ from forum_analyzer.preprocessor.trash_preprocessor import trash_preprocessing a
 from forum_analyzer.preprocessor.sentiment_preprocessor import sentiment_preprocessing as sa
 
 
-def preprocessed_group(link: str) -> bool:
+def preprocessed_group(link):
     path = os.path.join(os.path.dirname(__file__), "resources")
     processed_comments = sa.sentiment_analysis(path=path,
                                                train=tp.cleaning_comments(pg.save_comments_to_csv(link.replace(' ', ''),

@@ -3,13 +3,17 @@
     <div class="container-fluid">
                 <div class="row">
                     <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-                        <h1 class="page-header" style="display: inline-block; width: 900px;">List of comments for this tag</h1>
+                        <h1 class="page-header" style="display: inline-block; width: 900px;">
+                            List of comments for tag <span style="color: coral;">
+                            '{{ tag_name }}'
+                        </span>
+                        </h1>
                         <div class="table-responsive">
                             <table class="table table-striped" style="display: inline-block; width: 900px;">
                                 <tbody>
                                     {% for item in texts %}
                                         <tr>
-                                            <td><a href="/texts/{{ item.0.1 }}/">{{ item.0.0 }}</a></td>
+                                            <td><a href={% url 'text_info' url_id item.0.1 %}>{{ item.0.0 }}</a></td>
                                         </tr>
                                     {% endfor %}
                                 </tbody>
