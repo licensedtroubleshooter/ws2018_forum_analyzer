@@ -31,7 +31,7 @@
 
 Необходимо предустановить python, pip, virtualenv, PostgreSQL (с dev-пакетом)
 
-Для начала установим tkinker
+Для начала необходимо установить tkinker
 
 ```
 sudo apt-get install python3-tk
@@ -54,17 +54,17 @@ virtualenv -p python3 web
 ```
 sourse ~/ws2018_forum_analyzer/venv/web/bin/activate
 ```
-Устанавливаем пакеты python
+Устанавить пакеты python
 ```
 pip scpy, numpy, pandas, vk, catboost, psycopg2, scikit-learn, gensim, nltk, pymystem3, django==1.11.7
 ```
-Входим в командную строку python
+Войти в командную строку python
 
 ```
 python
 ```
 
-Выполняем операции 
+Выполнить операции 
 
 ```
 import nltk
