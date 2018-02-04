@@ -20,7 +20,7 @@ def preprocessed_group(link):
 
     dictionary = clustering.DictionaryCreator().create_dictionary_from_texts(plain_publications)
 
-    corpus = clustering.CorpusCreator(plain_publications, dictionary)
+    corpus = clustering.CorpusCreator(plain_publications, cleaner.get_sentiments_for_texts(), dictionary)
 
     cth = clustering.ClusterTopicsHelper(corpus)
     cth.cluster_texts()

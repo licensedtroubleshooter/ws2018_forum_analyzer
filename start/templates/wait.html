@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="description" content="The forums analizer">
+
+		<title>Forum Analyzer</title>
+        {% load static %}
+		<!-- Bootstrap core CSS -->
+		<link href="{% static "css/bootstrap.min.css" %}" rel="stylesheet">
+		<link href="{% static "css/dashboard.css" %}" rel="stylesheet">
+
+		<!-- Custom styles for this template -->
+		<link href="{% static "css/cover.css" %}" rel="stylesheet">
+
+		<style id="holderjs-style" type="text/css">
+			.btn-link{
+				color: #dddddd;
+				display: block;
+				font-size: 17px;
+			}
+			.btn-link:hover{
+				color: #cccccc;
+			}
+			.modal-title{
+				color: #888888;
+			}
+			.about{
+				text-indent: 10%;
+				text-align: center;
+				color: #000000;
+				text-shadow: none;
+			}
+			.step{
+				color: #000000;
+				text-align: left;
+				text-shadow: none;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="myModalAbout" class="modal fade">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<!-- Заголовок модального окна -->
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+						<h3 class="modal-title">About our project</h3>
+					</div>
+					<!-- Основное содержимое модального окна -->
+					<div class="modal-body">
+                        	<p class="about">Find Idea it is the application for the analysis of the users
+							experience on the basis of correspondence in publics of the organizations.</p>
+						<p  class="about">It allows to reduce time for identification of merits and demerits both
+							at own products and at competitors</p>
+                    </div>
+					<!-- Футер модального окна -->
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div id="myModalHelp" class="modal fade">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<!-- Заголовок модального окна -->
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+						<h3 class="modal-title">Help</h3>
+					</div>
+					<!-- Основное содержимое модального окна -->
+					<div class="modal-body">
+                        <p class="about">How to use the service "FIND IDEA":</p>
+						<p class="step">1. Enter the link of analysable discussion of the VKontakte group and press the "GO" button;</p>
+						<p class="step">2. If you want to look through at the list of all earlier analyzed groups and choose one of them,
+							follow the link in the bottom of the "Home" page;</p>
+						<p class="step">3. Choose the way of representation comments: as TAGS - the most popular words
+							or as CLUSTERS - the main themes correspondence;</p>
+						<p class="step">4. On the next stap you will see the list of TAGS or CLUSTERS.
+							If you are on the cluster's page, you can change the count of clusters by pressing button with number;</p>
+						<p class="step">5. If you see the list for particular tag or cluster, you can choose the comment and look
+							through information about it.</p>
+                    </div>
+					<!-- Футер модального окна -->
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div id="myModalWait" class="modal fade">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<!-- Заголовок модального окна -->
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+						<h3 class="modal-title"></h3>
+					</div>
+					<!-- Основное содержимое модального окна -->
+					<div class="modal-body">
+						<p class="step">Please, wait...</p>
+                    </div>
+					<!-- Футер модального окна -->
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
+					</div>
+				</div>
+			</div>
+		</div>
+        <div class="site-wrapper">
+			<div class="site-wrapper-inner">
+				<div class="cover-container">
+					<div class="masthead clearfix">
+						<div class="inner">
+							<h3 class="masthead-brand">ws2018_find_idea</h3>
+							<ul class="nav masthead-nav">
+								<li class="active"><a href={% url 'index' %}>Home</a></li>
+								<li class="active">
+									<a href="#" data-toggle="modal" data-target="#myModalAbout">About</a>
+								</li>
+								<li class="active">
+									<a href="#" data-toggle="modal" data-target="#myModalHelp">Help</a>
+								</li>
+							</ul>
+						</div>
+					</div>
+					<div class="inner cover" align="center">
+						<h1 class="cover-heading">Please, wait few minutes.</h1>
+
+					</div>
+					<div class="mastfoot">
+						<div class="inner">
+							<p class="lead">
+									<a href={% url 'urls' %} class="btn btn-link">List of all analyzed groups</a>
+							</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<script src="{% static "js/jquery.min.js" %}"></script>
+		<script src="{% static "js/bootstrap.min.js" %}"></script>
+		<script src="{% static "js/docs.min.js" %}"></script>
+
+    </body>
+</html>

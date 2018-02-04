@@ -16,6 +16,9 @@ def go_url(request):
 
         url_id = db.add_group_to_postgres(url)
 
+        if url_id is None:
+            return render(request, 'wait.html', locals())
+
         return render(request, 'choice.html', locals())
 
     return render(request, 'index.html', locals())

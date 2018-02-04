@@ -7,6 +7,8 @@ import pymystem3
 import numpy as np
 import pandas as pd
 
+from colour import Color
+from PIL import Image, ImageDraw
 from wordcloud import WordCloud
 from operator import itemgetter
 from collections import Counter, defaultdict
@@ -19,6 +21,7 @@ from sklearn.decomposition import LatentDirichletAllocation
 
 class DatasetCleaner(object):
     def __init__(self, csv_path):
+        self.csv_path = csv_path
         self.texts = pd.read_csv(csv_path)['text'].tolist()
 
     def clean_texts_from_junk(self):
@@ -27,6 +30,9 @@ class DatasetCleaner(object):
             plain_publications[i] = ' '.join(list(filter(None, re.split('[^а-я]', publication))))
 
         return plain_publications
+
+    def get_sentiments_for_texts(self):
+        return pd.read_csv(self.csv_path)['color'].tolist()
 
 
 class DictionaryCreator(object):
@@ -82,7 +88,7 @@ class CorpusCreator(object):
     COMMENTS_DICT_FILE_NAME = os.path.join(PATH, 'resources', "comments.dict")
     COMMENTS_MM_FILE_NAME = os.path.join(PATH, 'resources', "comments.mm")
 
-    def __init__(self, texts, dictionary=None):
+    def __init__(self, texts, sentiments, dictionary=None):
         if (os.path.exists(self.COMMENTS_DICT_FILE_NAME) and os.path.exists(self.COMMENTS_MM_FILE_NAME)):
             self.dictionary = corpora.Dictionary.load(self.COMMENTS_DICT_FILE_NAME)
             self.corpus = corpora.MmCorpus(self.COMMENTS_MM_FILE_NAME)
@@ -94,6 +100,7 @@ class CorpusCreator(object):
 
         self.texts = np.asarray(texts)
         self.stop_words = DictionaryCreator().stop_words
+        self.sentiments = sentiments
 
 
 class ClusterTopicsHelper(object):
@@ -107,16 +114,16 @@ class ClusterTopicsHelper(object):
 
     MODELS_FILENAME = os.path.join(PATH, 'resources', 'comm')
 
-    CLUSTER_IMAGES_FILENAME = os.path.join(PATH, os.path.join('resources', 'images'), 'cluster_image_{}.png')
+    CLUSTER_IMAGES_FILENAME = os.path.join(PATH, os.path.join('resources', 'images'), '{}.png')
 
     ERROR_NOT_ENOUGH_POSTS_FOR_SUMMARY = 'Summary is not available for this cluster.'
     ERROR_NOT_ENOUGH_POSTS_FOR_TAGS = 'Keywords are not available for this cluster.'
 
-    def __init__(self, corpus):
+    def __init__(self, corpus, num_of_clusters=5, num_of_texts_for_keywords=500, num_of_keywords_to_extract=500):
         self.corpus = corpus
-        self.num_of_clusters = 5
-        self.num_of_texts_for_keywords = 500
-        self.num_of_keywords_to_extract = 500
+        self.num_of_clusters = num_of_clusters
+        self.num_of_texts_for_keywords = num_of_texts_for_keywords
+        self.num_of_keywords_to_extract = num_of_keywords_to_extract
 
     def cluster_texts(self, clustering_method='artm', vectorizing_method='artm'):
         self._make_uci_dataset_from_corpus()
@@ -137,7 +144,6 @@ class ClusterTopicsHelper(object):
         tag_comment = self._get_tags_for_comments(tags)
         self._save_tag_comment(tag_comment)
 
-
     def _get_corpus_vector_representation(self, vectorizing_method='artm'):
         if 'gensim' == vectorizing_method:
             return self._get_tfidf_for_corpus()
@@ -145,10 +151,10 @@ class ClusterTopicsHelper(object):
             return self._get_frequencies_for_corpus()
         elif 'artm' == vectorizing_method:
             batch_vectorizer = None
-            #if len(glob.glob(os.path.join(self.MODELS_FILENAME, '*.batch'))) < 1:
+            # if len(glob.glob(os.path.join(self.MODELS_FILENAME, '*.batch'))) < 1:
             batch_vectorizer = artm.BatchVectorizer(data_path=self.RESOURCES_FOLDER, data_format='bow_uci',
-                                                        collection_name='comm', target_folder=self.MODELS_FILENAME)
-            #else:
+                                                    collection_name='comm', target_folder=self.MODELS_FILENAME)
+            # else:
             #    batch_vectorizer = artm.BatchVectorizer(data_path=self.MODELS_FILENAME, data_format='batches')
 
             return {'batch_vectorizer': batch_vectorizer, 'dictionary': batch_vectorizer.dictionary}
@@ -185,6 +191,39 @@ class ClusterTopicsHelper(object):
             return model_artm.transform(batch_vectorizer=batch_vectorizer).T
 
     def _save_comments(self, comments_clusters):
+        print(comments_clusters)
+
+        cluster_sentiment = dict()
+        for cc in comments_clusters:
+            if cc[1] not in cluster_sentiment.keys():
+                cluster_sentiment[cc[1]] = 0
+
+            cluster_sentiment[cc[1]] += self.corpus.sentiments[cc[0]]
+
+        cluster_sentiments = []
+        for i in range(self.num_of_clusters):
+            cluster_sentiments.append(cluster_sentiment[i])
+
+        max_element = max(cluster_sentiments)
+
+        for i in range(len(cluster_sentiments)):
+            cluster_sentiments[i] = int((cluster_sentiments[i] / max_element) * 10)
+
+        print(cluster_sentiments)
+
+        red = Color("red")
+        colors = list(red.range_to(Color("green"), 11))
+        for i in range(len(colors)):
+            color = []
+            for x in colors[i].get_rgb():
+                color.append(int(x * 255.))
+            colors[i] = color
+
+        for i, color in enumerate(cluster_sentiments):
+            img = Image.new('RGB', (32, 32), tuple(colors[color]))
+            imgDrawer = ImageDraw.Draw(img)
+            img.save(self.CLUSTER_IMAGES_FILENAME.format(i))
+
         comments_clusters_df = pd.DataFrame(comments_clusters)
         comments_clusters_df.columns = ['comment_id', 'cluster_id']
 
@@ -369,13 +408,14 @@ class ClusterTopicsHelper(object):
                 f.write(key)
                 f.write('\n')
 
+
 if __name__ == '__main__':
     cleaner = DatasetCleaner(csv_path='../neg_comments_t_50000.csv')
     plain_publications = cleaner.clean_texts_from_junk()
 
     dictionary = DictionaryCreator().create_dictionary_from_texts(' '.join(plain_publications))
 
-    corpus = CorpusCreator(plain_publications, dictionary)
+    corpus = CorpusCreator(plain_publications, sentiments=cleaner.get_sentiments_for_texts(), dictionary=dictionary)
 
     cth = ClusterTopicsHelper(corpus)
     cth.cluster_texts()

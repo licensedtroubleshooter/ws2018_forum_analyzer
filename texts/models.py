@@ -7,6 +7,7 @@ class Url(models.Model):
 
     url = models.CharField(max_length=256)
     name_url = models.CharField(max_length=256, default='')
+    image = models.ImageField(null=True, max_length=500)
 
     def __str__(self):
         return "{}: {}".format(self.id, self.url)

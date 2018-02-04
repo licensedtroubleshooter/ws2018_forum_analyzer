@@ -1,13 +1,30 @@
 {% extends 'show_result.html' %}
 {% block clusters %}
+    {% load static %}
     <div class="container-fluid">
                 <div class="row">
-                    <div class="col-sm-8 col-md-offset-2 main">
-                        <h1 class="page-header">List of clusters</h1>
-                        <div class="table-responsive">
+                    <div class="col-xs-8 col-xs-offset-2 main">
+                        <img src={% static image_url %} align="left" style="margin-right:2%; margin-bottom:2%">
+					<h1 class="page-header">List of clusters</h1>
+					<div class="row">
+						<div class="col-xs-5"  >
+							<h5> You can change cluster's count:</h5>
+						</div>
+						<div class="col-xs-1" align="right">
+							<button type="submit" class="btn btn-default">5</button>
+						</div>
+						<div class="col-xs-1">
+								<button type="submit" class="btn btn-default">10</button>
+						</div>
+						<div class="col-xs-1">
+							<button type="submit" class="btn btn-default">15</button>
+						</div>
+					</div>
+                        <div class="table">
                             <table class="table table-striped">
                                 <thead>
                                     <tr>
+                                        <th>Sentiment</th>
                                         <th>Cluster</th>
                                         <th>Count</th>
                                     </tr>
@@ -15,9 +32,12 @@
                                 <tbody>
                                     {% for item in cluster_list %}
                                         <tr>
+                                        <td style="width: 5%;">
+                                            <img src={%  static item.2 %} style=" width:5vh; height:5vh;">
+                                        </td>
+                                            <td style="width: 60%;"><a href={% url 'texts_cluster' url_id item.0 %}>{{ item.1 }}</a></td>
 
-                                            <td><a href={% url 'texts_cluster' url_id item.0 %}>{{ item.1 }}</a></td>
-                                            <td><span>{{ item.2 }}</span></td>
+                                            <td style="width: 20%;"><span>{{ item.3 }}</span></td>
 
                                         </tr>
                                     {% endfor %}
