@@ -26,25 +26,27 @@
 
 ## Сборка
 
-#### Требования
+#### Требования:
 
 Необходимо предустановить python, pip, virtualenv, [BigArtm](http://bigartm.org), PostgreSQL (с dev-пакетом)
 
+#### Установка:
+
 Для начала необходимо установить tkinker:
 
-```
+```bash
 sudo apt-get install python3-tk
 ```
 
 Клонировать репозиторий:
 
-```
+```bash
 git clone https://github.com/42lacksky/ws2018_forum_analyzer.git
 ```
 
 Создать и активировать виртуальное окружение: 
 
-```
+```bash
 cd ~/ws2018_forum_analyzer/venv
 virtualenv -p python3 web
 sourse ~/ws2018_forum_analyzer/venv/web/bin/activate
@@ -52,13 +54,14 @@ sourse ~/ws2018_forum_analyzer/venv/web/bin/activate
 
 Устанавить в виртуальное окружение пакеты python:
 
-```
-pip scpy numpy pandas vk catboost psycopg2 scikit-learn gensim nltk pymystem3 django==1.11.7
+```bash
+pip scpy numpy pandas vk catboost psycopg2 scikit-learn gensim nltk pymystem3
+pip django==1.11.7 (если планируете использовать web-интерфейс)
 ```
 
 Выполнить команды: 
 
-```
+```bash
 python
 >> import nltk
 >> nltk.download('stopworld')
@@ -67,11 +70,31 @@ python
 
 Выполнить операции:
 
- ```
+ ```bash
  python <путь>/ws2018_forum_analyzer/manage.py makemigration
  python <путь>/ws2018_forum_analyzer/manage.py makemigration text
  python <путь>/ws2018_forum_analyzer/manage.py makemigration tags
  python <путь>/ws2018_forum_analyzer/manage.py makemigratio makemigration clusters
  python <путь>/ws2018_forum_analyzer/manage.py migrate
  ```
+ 
+#### Проверить работоспособность установленного приложения:
+
+Web-интерфейс:
+
+```bash
+python <путь>/ws2018_forum_analyzer/manage.py runserver <адрес:порт>
+```
+По умолчанию используется localhost:8000
+
+Исключительно алгоритм: 
+
+```bash
+python
+>> import src
+>> import src.datadase
+>> import forum_analyze\
+>> src.datadase.add_group_to_postgres('<ссылка на ГРУППУ в вк>')
+```
+
 
