@@ -47,12 +47,14 @@ git clone https://github.com/42lacksky/ws2018_forum_analyzer.git
 Создать и активировать виртуальное окружение: 
 
 ```bash
-cd ~/ws2018_forum_analyzer/venv
+cd ~/ws2018_forum_analyzer/
+mkdir venv
+cd venv
 virtualenv -p python3 web
 sourse ~/ws2018_forum_analyzer/venv/web/bin/activate
 ```
 
-Устанавить в виртуальное окружение пакеты python:
+Установить в виртуальное окружение пакеты python:
 
 ```bash
 pip scpy numpy pandas vk catboost psycopg2 scikit-learn gensim nltk pymystem3
