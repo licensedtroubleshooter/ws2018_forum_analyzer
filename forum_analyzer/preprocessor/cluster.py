@@ -198,7 +198,7 @@ class ClusterTopicsHelper(object):
             if cc[1] not in cluster_sentiment.keys():
                 cluster_sentiment[cc[1]] = 0
 
-            cluster_sentiment[cc[1]] += self.corpus.sentiments[cc[0]]
+            cluster_sentiment[cc[1]] += self.corpus.sentiments[cc[0] % len(self.corpus.sentiments)]
 
         cluster_sentiments = []
         for i in range(self.num_of_clusters):
