@@ -27,6 +27,17 @@
 			.modal-title{
 				color: #888888;
 			}
+			.about{
+				text-indent: 10%;
+				text-align: center;
+				color: #000000;
+				text-shadow: none;
+			}
+			.step{
+				color: #000000;
+				text-align: left;
+				text-shadow: none;
+			}
 		</style>
 	</head>
 	<body>	
@@ -39,7 +50,12 @@
 						<h3 class="modal-title">About our project</h3>
 					</div>
 					<!-- Основное содержимое модального окна -->
-					<div class="modal-body">Содержимое модального окна...</div>
+					<div class="modal-body">
+                        	<p class="about">Find Idea it is the application for the analysis of the users
+							experience on the basis of correspondence in publics of the organizations.</p>
+						<p  class="about">It allows to reduce time for identification of merits and demerits both
+							at own products and at competitors</p>
+                    </div>
 					<!-- Футер модального окна -->
 					<div class="modal-footer">
 						<button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
@@ -56,7 +72,18 @@
 						<h3 class="modal-title">Help</h3>
 					</div>
 					<!-- Основное содержимое модального окна -->
-					<div class="modal-body">Содержимое модального окна...</div>
+					<div class="modal-body">
+                        <p class="about">How to use the service "FIND IDEA":</p>
+						<p class="step">1. Enter the link of analysable discussion of the VKontakte group and press the "GO" button;</p>
+						<p class="step">2. If you want to look through at the list of all earlier analyzed groups and choose one of them,
+							follow the link in the bottom of the "Home" page;</p>
+						<p class="step">3. Choose the way of representation comments: as TAGS - the most popular words
+							or as CLUSTERS - the main themes correspondence;</p>
+						<p class="step">4. On the next stap you will see the list of TAGS or CLUSTERS.
+							If you are on the cluster's page, you can change the count of clusters by pressing button with number;</p>
+						<p class="step">5. If you see the list for particular tag or cluster, you can choose the comment and look
+							through information about it.</p>
+                    </div>
 					<!-- Футер модального окна -->
 					<div class="modal-footer">
 						<button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
@@ -64,12 +91,31 @@
 				</div>
 			</div>
 		</div>		
-		<div class="site-wrapper">
+		<div id="myModalWait" class="modal fade">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<!-- Заголовок модального окна -->
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+						<h3 class="modal-title"></h3>
+					</div>
+					<!-- Основное содержимое модального окна -->
+					<div class="modal-body">
+						<p class="step">Please, wait...</p>
+                    </div>
+					<!-- Футер модального окна -->
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
+					</div>
+				</div>
+			</div>
+		</div>
+        <div class="site-wrapper">
 			<div class="site-wrapper-inner">
 				<div class="cover-container">
 					<div class="masthead clearfix">
 						<div class="inner">
-							<h3 class="masthead-brand">ws2018_forum_analyzer</h3>
+							<h3 class="masthead-brand">ws2018_find_idea</h3>
 							<ul class="nav masthead-nav">
 								<li class="active"><a href={% url 'index' %}>Home</a></li>
 								<li class="active">
@@ -81,16 +127,16 @@
 							</ul>
 						</div>
 					</div>
-					<div class="inner cover">
-						<h1 class="cover-heading">Know flaws</h1>
+					<div class="inner cover" align="center">
+						<h1 class="cover-heading">Find the idea here</h1>
 						<div class="row">
-							<div class="col-md-10">
-								<form method="post" class="navbar-form navbar-righrt"  align="right">
+							<div class="col-xs-12">
+								<form method="post" class="navbar-form navbar-righrt"  align="center">
 									{% csrf_token %}
                                     <input type="text" class="form-control" name="url"
                                            placeholder="Insert the group's address..." size="50%">
 
-                                    <button type="submit" class="btn btn-default" type="submit">GO</button>
+                                    <button type="submit" class="btn btn-default" type="submit" id="go">GO</button>
 								</form>
 							</div>
 						</div>
@@ -108,5 +154,14 @@
 		<script src="{% static "js/jquery.min.js" %}"></script>
 		<script src="{% static "js/bootstrap.min.js" %}"></script>
 		<script src="{% static "js/docs.min.js" %}"></script>
-	</body>
+	    <script>
+            $('#button.go').on('click', function () {
+                var flag = {{ delay }};
+                if (flag == True) {
+                    $('#button.go').attr('data-target', '#myModalWait');
+                };
+            });
+{#            $('button.go').attr('data-target', '#myModalWait')#}
+        </script>
+    </body>
 </html>
