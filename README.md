@@ -57,8 +57,8 @@ sourse ~/ws2018_forum_analyzer/venv/web/bin/activate
 Установить в виртуальное окружение пакеты python:
 
 ```bash
-pip scpy numpy pandas vk catboost psycopg2 scikit-learn gensim nltk pymystem3
-pip django==1.11.7 (если планируете использовать web-интерфейс)
+pip install scpy numpy pandas vk catboost psycopg2 scikit-learn gensim nltk pymystem3
+pip install django==1.11.7 (если планируете использовать web-интерфейс)
 ```
 
 Выполнить команды: 
