@@ -32,11 +32,15 @@ def preprocessed_group(link):
 
 def main():
     link = input('Input link to groups: ')
-    comments = pg.save_comments_to_csv(link[:-1])
-    # comments = '/home/rebcd/Education/Git/ws18_web_interface/forum_analyzer/raw_comments.csv'
+
+    parser = pg.Parser()
+    comments = parser.save_comments_to_csv('https://vk.com/planetasushi_ru')
+    #comments = pg.save_comments_to_csv(link[:-1])
     print(comments)
+
     comments = tp.cleaning_comments(comments)
     print(comments)
+
     comments = sa.sentiment_analysis(comments)
     print(comments)
 
