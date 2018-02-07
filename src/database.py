@@ -1,12 +1,13 @@
 # coding=utf-8
-import vk
-import re
 import os
+import re
 import shutil
-import psycopg2
+
 import pandas as pd
-import forum_analyzer.preprocessor.preprocessor as preprocessor
-from django.core.files import File
+import psycopg2
+import vk
+
+import core.preprocessor as preprocessor
 
 IS_BUSY = False
 

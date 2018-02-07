@@ -1,5 +1,4 @@
-import forum_analyzer.preprocessor.preprocessor as preproc
-import src.database as db
+import core.preprocessor as preproc
 
 link = input()
 # db.add_group_to_postgres(link)

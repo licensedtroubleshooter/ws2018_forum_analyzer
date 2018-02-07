@@ -1,4 +1,0 @@
-include README.rst
-include ./trash_preprocessor/train.csv
-include ./sentiment_preprocessor/twitter_clean.csv
-include ./sentiment_preprocessor/swords.txt
