@@ -10,9 +10,12 @@ class Cleaner(object):
     def __init__(self, root_path='./data'):
         self.DATA_ROOT_PATH = root_path
 
+        self.MODEL_FILE_PATH = os.path.join(self.DATA_ROOT_PATH, 'trash_model')
+        self.VECTORIZER_FILE_PATH = os.path.join(self.DATA_ROOT_PATH, 'trash_vectorizer')
 
     def train_preprocessor(self, train='train.csv'):
         print('start train trash preprocessor...')
+
         df = pd.read_csv(os.path.join(self.DATA_ROOT_PATH, train))
 
         train_data = df[:-100]
@@ -32,21 +35,21 @@ class Cleaner(object):
                   eval_set=(x_validation_counts.toarray(), validation_data.status),
                   use_best_model=True,)
 
-        model.save_model(os.path.join(self.DATA_ROOT_PATH, 'trash_model'))
-        joblib.dump(vectorizer,os.path.join(self.DATA_ROOT_PATH, 'trash_vectorizer'))
+        model.save_model(self.MODEL_FILE_PATH)
+        joblib.dump(vectorizer, self.VECTORIZER_FILE_PATH)
 
         print('end train sentiment preprocessor...')
 
 
-    def cleaning_comments(self, raw_comments, path='.') -> str:
+    def cleaning_comments(self, raw_comments) -> str:
         print('start cleaning of comments...')
 
         raw = pd.read_csv(raw_comments)
-        cleaned_comments = os.path.join(path, 'cleaned_comments.csv')
-        bad_comments = os.path.join(path, 'bad_comments.csv')
+        cleaned_comments = os.path.join(self.DATA_ROOT_PATH, 'cleaned_comments.csv')
+        bad_comments = os.path.join(self.DATA_ROOT_PATH, 'bad_comments.csv')
 
-        model = CatBoostClassifier().load_model(os.path.join(path, 'trash_model'))
-        vectorizer = joblib.load(os.path.join(path, 'trash_vectorizer'))
+        model = CatBoostClassifier().load_model(os.path.join(self.DATA_ROOT_PATH, 'trash_model'))
+        vectorizer = joblib.load(os.path.join(self.DATA_ROOT_PATH, 'trash_vectorizer'))
 
         hyp = model.predict_proba(vectorizer.transform(raw.text).toarray())
         with open(cleaned_comments, 'w') as cleaned, open(bad_comments, 'w') as bad:
@@ -67,8 +70,11 @@ class Cleaner(object):
 
 
 def main():
-    train_preprocessor('train.csv')
-    cleaning_comments('rc.csv')
+    cleaner = Cleaner()
+    cleaner.train_preprocessor()
+
+    #train_preprocessor('train.csv')
+    #cleaning_comments('rc.csv')
 
 
 if __name__ == '__main__':
